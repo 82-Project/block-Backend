@@ -8,7 +8,9 @@ const postModel = new mongoose.Schema({
     },
     title: {
         type: String,
-        required: true
+        required: true,
+        trim: true,
+        maxlength: 300
     }
 })
 

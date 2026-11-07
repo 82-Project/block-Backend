@@ -40,4 +40,62 @@ const getByid = async (req, res) => {
     res.status(200).json({ message: "user topildi", user: user })
 }
 
-module.exports = { userEdite, getByid }
+const getAlluser = async (req, res) => {
+    const users = await userModel.find()
+
+    res.status(200).json({ message: "hamma userlar", user: users })
+}
+
+const login = async (req, res) => {
+    const { email, password } = req.body
+    if (!email || !password) {
+        return res.status(400).json({ message: "hamma malumotlarni toldir" })
+    }
+
+    const user = await userModel.findOne({ email })
+
+    if (!user || user.password !== password) {
+        return res.status(404).json({ message: "bunday account yoq" })
+    }
+
+    res.status(200).json({ message: "accountga kirding", user: user })
+}
+
+const register = async (req, res) => {
+    const { firstName, lastName, username, email, phone, password, avatar } = req.body
+    if (!firstName || !lastName || !username || !email || !password) {
+        return res.status(400).json({ message: "hamma malumotni toldir" })
+    }
+
+    const findEmail = await userModel.findOne({ email })
+
+    if (findEmail) {
+        return res.status(400).json({ message: "bu email account ochilgan " })
+    }
+
+    const userName = await userModel.findOne({ username })
+
+    if (userName) {
+        return res.status(400).json({ message: "username band" })
+    }
+
+    const newUser = await userModel({
+        firstName,
+        lastName,
+        username,
+        email,
+        phone,
+        password,
+        avatar
+    })
+
+    await newUser.save()
+    res.status(201).json({ message: "user yaratildi", user: newUser })
+}
+
+const deleteAll = async (req , res) => {
+    const users = await userModel.deleteMany({})
+    res.status(200).json({message: "hamma userlar ochirildi "})
+}
+
+module.exports = { userEdite, getByid, login, getAlluser, register ,deleteAll }
