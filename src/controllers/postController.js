@@ -23,7 +23,7 @@ const create = async (req, res) => {
     })
 
     await newPost.save()
-    res.status(201).json({ message: "post yaratildi", post: newPost})
+    res.status(201).json({ message: "post yaratildi", post: newPost })
 }
 
 const getAllposts = async (req, res) => {
@@ -31,6 +31,36 @@ const getAllposts = async (req, res) => {
     res.status(200).json({ message: "hamma postlar", posts: post })
 }
 
+const deletePost = async (req, res) => {
+    const { id } = req.params
+    const findPost = await postModel.findByIdAndDelete(id)
+    if (!findPost) {
+        return res.status(404).json({ message: "bunday post yoq" })
+    }
+    res.status(200).json({ message: "post ochirildi" })
+}
 
 
-module.exports = { create , getAllposts}
+const editePost = async (req, res) => {
+    const { id } = req.params
+    const { user, title } = req.body
+    if (!user || !title) {
+        return res.status(400).json({ mesasge: "hamma malumotlarni toldiring" })
+    }
+
+    const findPost = await postModel.findById(id)
+    if (!findPost) {
+        return res.status(404).json({ message: "bunday post topilmadi" })
+    }
+
+    const post = await postModel.findByIdAndUpdate(id, {
+        user: user,
+        title: title
+    })
+
+    res.status(200).json({
+        message: "post edit qilindi", post: post
+    })
+}
+
+module.exports = { create, getAllposts, deletePost, editePost }
